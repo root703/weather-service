@@ -1,30 +1,12 @@
-pipeline {
-  agent any
-  stages {
-    stage('Build') {
-      parallel {
-      
-        stage('Build') {
-          steps {
-            git(url: 'https://github.com/brainupgrade-in/weather-service.git', branch: 'main')
-            build 'mvn clean install'
-          }
-        }
-
-      }
+node('jenkins-slave') {
+    
+     stage('build') {
+        sh(script: """
+            echo "hello"
+           git clone https://github.com/brainupgrade-in/weather-service.git
+           cd ./brainupgrade-in/weather-service
+           mvn clean install
+           docker build . -t brainupgrade-in/weather-service
+        """)
     }
-
-    stage('Test') {
-      steps {
-        echo 'Testing..'
-      }
-    }
-
-    stage('Deploy') {
-      steps {
-        echo 'Deploying....'
-      }
-    }
-
-  }
 }
