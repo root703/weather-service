@@ -1,12 +1,46 @@
-node('jenkins-slave') {
-    
-     stage('build') {
-        sh(script: """
-            echo "hello"
-           git clone https://github.com/brainupgrade-in/weather-service.git
-           cd ./brainupgrade-in/weather-service
-           mvn clean install
-           docker build . -t brainupgrade-in/weather-service
-        """)
+pipeline {
+
+  environment {
+    registry = "brainupgrade/weather-service"
+    dockerImage = ""
+  }
+
+  agent any
+
+  stages {
+
+    stage('Checkout Source') {
+      steps {
+        git 'https://github.com/brainupgrade-in/weather-service.git'
+      }
     }
+
+    stage('Build image') {
+      steps{
+        script {
+          dockerImage = docker.build registry + ":$BUILD_NUMBER"
+        }
+      }
+    }
+
+    stage('Push Image') {
+      steps{
+        script {
+          docker.withRegistry( "" ) {
+            dockerImage.push()
+          }
+        }
+      }
+    }
+
+    stage('Deploy App') {
+      steps {
+        script {
+          kubernetesDeploy(configs: "deploy.yaml", kubeconfigId: "jenkinskubeconfig")
+        }
+      }
+    }
+
+  }
+
 }
