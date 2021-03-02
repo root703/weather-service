@@ -12,6 +12,7 @@ pipeline {
     stage('Checkout Source') {
       steps {
         git 'https://github.com/brainupgrade-in/weather-service.git'
+        sh 'mvn clean install'
       }
     }
 
