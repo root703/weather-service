@@ -15,7 +15,7 @@ spec:
         app: weather-services
     spec:
       containers:
-        - image: brainupgrade/weather-services:5
+        - image: brainupgrade/weather-services:latest
           imagePullPolicy: Always
           name: weather-services
           env:
